@@ -9,9 +9,6 @@ on:
 jobs:
   backend-ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Backend
     
     steps:
       - uses: actions/checkout@v4
@@ -19,18 +16,15 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: Backend/package-lock.json
+          cache-dependency-path: package-lock.json
       
       - run: npm ci
-      - run: npx prisma generate
-      - run: npm run lint
-      - run: npm run test
+      - run: npm run prisma:generate --workspace=Backend
+      - run: npm run lint --workspace=Backend
+      - run: npm run test --workspace=Backend
 
   frontend-ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +32,8 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
+          cache-dependency-path: package-lock.json
       
       - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      - run: npm run lint --workspace=Frontend
+      - run: npm run build --workspace=Frontend
