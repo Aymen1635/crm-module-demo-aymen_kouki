@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ClientType {
+  COMPANY
+  INDIVIDUAL
+}
+
+enum OpportunityStage {
+  LEAD
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+model Client {
+  id          String     @id @default(uuid()) @db.Uuid
+  type        ClientType
+  companyName String?    @db.VarChar(255)
+  firstName   String?    @db.VarChar(100)
+  lastName    String?    @db.VarChar(100)
+  email       String     @db.VarChar(255)
+  phone       String?    @db.VarChar(30)
+  address     String?    @db.Text
+  notes       String?    @db.Text
+  deletedAt   DateTime?  @db.Timestamptz(6)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
+
+  opportunities Opportunity[]
+
+  @@index([type])
+  @@index([deletedAt])
+  @@index([email])
+  @@map("clients")
+}
+
+model Opportunity {
+  id                    String           @id @default(uuid()) @db.Uuid
+  clientId              String           @db.Uuid
+  title                 String           @db.VarChar(255)
+  amountCents           Int
+  currency              String           @default("EUR") @db.VarChar(3)
+  expectedSignatureDate DateTime         @db.Date
+  stage                 OpportunityStage @default(LEAD)
+  lastStageChangeAt     DateTime         @default(now()) @db.Timestamptz(6)
+  deletedAt             DateTime?        @db.Timestamptz(6)
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime         @updatedAt @db.Timestamptz(6)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@index([clientId])
+  @@index([stage])
+  @@index([expectedSignatureDate])
+  @@index([deletedAt])
+  @@index([clientId, stage])
+  @@index([stage, expectedSignatureDate])
+  @@map("opportunities")
+}
