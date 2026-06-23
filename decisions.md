@@ -210,3 +210,4 @@ Je pars sur :
 ## Résumé des choix
 
 En une phrase : j’ai privilégié une structure simple, une lecture métier claire, un soft delete, une pagination serveur basique, et des règles explicites pour identifier les opportunités problématiques. Ce sont des choix adaptés à un test où le raisonnement et la maintenabilité comptent plus qu’une architecture exhaustive. 
+

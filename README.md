@@ -34,11 +34,22 @@ cd crm
 npm install          # installs root + all workspaces
 ```
 
-### 2 — Environment
+### 2 — Environment Variables
 
-```bash
-cp .env.example .env
-# Edit .env and set DATABASE_URL to your Postgres instance
+You need to set up environment variables for both the backend and frontend.
+
+**Backend (`Backend/.env`):**
+Create a `.env` file inside the `Backend/` directory:
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/crm_dev"
+PORT=3001
+STAGNANT_THRESHOLD_DAYS=14
+```
+
+**Frontend (`Frontend/.env.local`):**
+Create a `.env.local` file inside the `Frontend/` directory:
+```env
+NEXT_PUBLIC_API_URL="http://localhost:3001"
 ```
 
 ### 3 — Database

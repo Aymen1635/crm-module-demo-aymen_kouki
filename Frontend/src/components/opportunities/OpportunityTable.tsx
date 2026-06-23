@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { OpportunityListItem } from '@/lib/types';
 import {
   formatCurrency,
@@ -16,6 +19,8 @@ interface OpportunityTableProps {
 }
 
 export function OpportunityTable({ opportunities }: OpportunityTableProps) {
+  const router = useRouter();
+
   if (opportunities.length === 0) {
     return (
       <div className="table-wrapper">
@@ -51,25 +56,26 @@ export function OpportunityTable({ opportunities }: OpportunityTableProps) {
           {opportunities.map((opp) => (
             <tr
               key={opp.id}
-              onClick={() => {
-                window.location.href = `/opportunities/${opp.id}`;
-              }}
+              onClick={() => router.push(`/opportunities/${opp.id}`)}
               style={{ cursor: 'pointer' }}
             >
               <td>
                 <div className="font-medium truncate" style={{ maxWidth: '240px' }}>
                   {opp.title}
                 </div>
-                <div className="td-secondary" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                <div
+                  className="td-secondary"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}
+                >
                   {opp.id.slice(0, 8)}…
                 </div>
               </td>
               <td>
-                <div className="font-medium">
-                  {getClientDisplayName(opp.client)}
-                </div>
-                <span className={`badge badge-sm ${CLIENT_TYPE_BADGE_CLASS[opp.client.type]}`}
-                  style={{ marginTop: '4px', display: 'inline-flex' }}>
+                <div className="font-medium">{getClientDisplayName(opp.client)}</div>
+                <span
+                  className={`badge badge-sm ${CLIENT_TYPE_BADGE_CLASS[opp.client.type]}`}
+                  style={{ marginTop: '4px', display: 'inline-flex' }}
+                >
                   {CLIENT_TYPE_LABELS[opp.client.type]}
                 </span>
               </td>
@@ -84,12 +90,10 @@ export function OpportunityTable({ opportunities }: OpportunityTableProps) {
                 </span>
               </td>
               <td>
-                <div className={
-                  opp.riskLabel === 'late'
-                    ? 'font-medium'
-                    : ''
-                }
-                  style={opp.riskLabel === 'late' ? { color: 'var(--color-danger)' } : {}}>
+                <div
+                  className={opp.riskLabel === 'late' ? 'font-medium' : ''}
+                  style={opp.riskLabel === 'late' ? { color: 'var(--color-danger)' } : {}}
+                >
                   {formatDate(opp.expectedSignatureDate)}
                 </div>
               </td>
