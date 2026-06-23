@@ -18,7 +18,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       
-      - run: npm ci
+      - run: npm install
       - run: npm run prisma:generate --workspace=Backend
       - run: npm run lint --workspace=Backend
       - run: npm run test --workspace=Backend
@@ -34,6 +34,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       
-      - run: npm ci
+      - run: npm install
       - run: npm run lint --workspace=Frontend
       - run: npm run build --workspace=Frontend
