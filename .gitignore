@@ -4,3 +4,5 @@ test.md
 /Frontend/node_modules
 /Backend/.env
 /Frontend/.env.local
+/Frontend/.next
+/Frontend/package-lock.json
