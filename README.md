@@ -87,7 +87,7 @@ npm run dev:frontend      # Next.js on :3000
 
 ```
 crm/
-├── backend/              # NestJS API
+├── Backend/              # NestJS API
 │   ├── prisma/           # schema.prisma + migrations + seed
 │   └── src/
 │       ├── clients/
@@ -95,7 +95,7 @@ crm/
 │       ├── pipeline/
 │       ├── prisma/       # PrismaService
 │       └── common/       # filters, pipes, types
-└── frontend/             # Next.js App Router
+└── Frontend/             # Next.js App Router
     └── src/
         ├── app/
         ├── components/

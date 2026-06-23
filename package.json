@@ -3,18 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend"
+    "Backend",
+    "Frontend"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "npm run start:dev --workspace=backend",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "db:migrate": "npm run prisma:migrate --workspace=backend",
-    "db:seed": "npm run prisma:seed --workspace=backend",
-    "db:studio": "npm run prisma:studio --workspace=backend",
-    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend"
+    "dev:backend": "npm run start:dev --workspace=Backend",
+    "dev:frontend": "npm run dev --workspace=Frontend",
+    "db:migrate": "npm run prisma:migrate --workspace=Backend",
+    "db:seed": "npm run prisma:seed --workspace=Backend",
+    "db:studio": "npm run prisma:studio --workspace=Backend",
+    "build": "npm run build --workspace=Backend && npm run build --workspace=Frontend",
+    "lint": "npm run lint --workspace=Backend && npm run lint --workspace=Frontend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
