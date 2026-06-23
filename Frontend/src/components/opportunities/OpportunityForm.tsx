@@ -162,7 +162,7 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
           companyName: newClient.type === 'COMPANY' ? newClient.companyName.trim() : undefined,
           firstName: newClient.type === 'INDIVIDUAL' ? newClient.firstName.trim() : undefined,
           lastName: newClient.type === 'INDIVIDUAL' ? newClient.lastName.trim() : undefined,
-          email: newClient.email.trim() || undefined,
+          email: newClient.email.trim(),
           phone: newClient.phone.trim() || undefined,
           address: newClient.address.trim() || undefined,
           notes: newClient.notes.trim() || undefined,
