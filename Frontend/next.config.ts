@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Allow cross-origin requests to the backend in dev
+  // Proxy /api/* → NestJS backend in dev to avoid CORS issues
   async rewrites() {
     return [
       {
