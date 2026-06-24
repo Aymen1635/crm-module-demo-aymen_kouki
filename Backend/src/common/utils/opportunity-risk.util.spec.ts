@@ -26,15 +26,19 @@ describe('computeRiskLabel', () => {
   });
 
   it('should return null for closed stages (WON/LOST) regardless of dates', () => {
-    const opp = {
+    const oppWon = {
       stage: OpportunityStage.WON,
       expectedSignatureDate: new Date('2020-01-01T00:00:00.000Z'), // Very late
       lastStageChangeAt: new Date('2020-01-01T00:00:00.000Z'), // Very stagnant
     };
-    expect(computeRiskLabel(opp)).toBeNull();
+    expect(computeRiskLabel(oppWon)).toBeNull();
 
-    opp.stage = OpportunityStage.LOST;
-    expect(computeRiskLabel(opp)).toBeNull();
+    const oppLost = {
+      stage: OpportunityStage.LOST,
+      expectedSignatureDate: new Date('2020-01-01T00:00:00.000Z'), // Very late
+      lastStageChangeAt: new Date('2020-01-01T00:00:00.000Z'), // Very stagnant
+    };
+    expect(computeRiskLabel(oppLost)).toBeNull();
   });
 
   it('should return null if not late and not stagnant', () => {
