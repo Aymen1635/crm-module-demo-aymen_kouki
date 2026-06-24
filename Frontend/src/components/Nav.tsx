@@ -10,6 +10,7 @@ export function Nav() {
 
   // Initialize theme from system or localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;  // ← add this
     const saved = localStorage.getItem('crm-theme') as 'light' | 'dark' | null;
     if (saved) {
       setTheme(saved);

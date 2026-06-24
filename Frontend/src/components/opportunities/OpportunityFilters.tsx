@@ -13,13 +13,13 @@ export function OpportunityFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentStage = searchParams.get('stage') ?? '';
-  const currentClientType = searchParams.get('clientType') ?? '';
-  const currentSortBy = searchParams.get('sortBy') ?? 'createdAt';
-  const currentOrder = searchParams.get('order') ?? 'desc';
+  const currentStage = searchParams?.get('stage') ?? '';
+  const currentClientType = searchParams?.get('clientType') ?? '';
+  const currentSortBy = searchParams?.get('sortBy') ?? 'createdAt';
+  const currentOrder = searchParams?.get('order') ?? 'desc';
 
   function updateFilter(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
     if (value) {
       params.set(key, value);
     } else {
@@ -27,11 +27,11 @@ export function OpportunityFilters() {
     }
     // Reset to page 1 when filter changes
     params.delete('page');
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname ?? '/opportunities'}?${params.toString()}`);
   }
 
   function clearFilters() {
-    router.push(pathname);
+    router.push(pathname ?? '/opportunities');
   }
 
   const hasActiveFilters = currentStage || currentClientType;

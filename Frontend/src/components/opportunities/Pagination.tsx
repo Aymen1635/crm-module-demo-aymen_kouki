@@ -15,9 +15,9 @@ export function Pagination({ currentPage, totalPages, total, limit }: Pagination
   const searchParams = useSearchParams();
 
   function goToPage(page: number) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
     params.set('page', String(page));
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname ?? '/opportunities'}?${params.toString()}`);
   }
 
   if (totalPages <= 1) return null;
