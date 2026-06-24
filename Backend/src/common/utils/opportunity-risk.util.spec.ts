@@ -10,19 +10,13 @@ describe('computeRiskLabel', () => {
     process.env = { ...originalEnv, STAGNANT_THRESHOLD_DAYS: '14' };
 
     // Mock Date to a fixed point in time: 2026-06-25T12:00:00.000Z
-    mockNow = new Date('2026-06-25T12:00:00.000Z').getTime();
-    jest.spyOn(global, 'Date').mockImplementation(function (
-      this: Date,
-      ...args: any[]
-    ) {
-      if (args.length === 0) return new (Date as any)(mockNow);
-      return new (Date as any)(...args);
-    } as any);
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-06-25T12:00:00.000Z'));
   });
 
   afterEach(() => {
     process.env = originalEnv;
-    jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   it('should return null for closed stages (WON/LOST) regardless of dates', () => {
