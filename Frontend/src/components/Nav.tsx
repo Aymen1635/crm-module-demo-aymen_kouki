@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
@@ -48,13 +49,22 @@ export function Nav() {
       {/* ─ Desktop sidebar ─ */}
       <nav className="app-nav">
         <div>
-          <div className="nav-logo">
-            <div className="nav-logo-icon">⚡</div>
-            <div>
-              <div className="nav-logo-text">CRM</div>
-              <div className="nav-logo-sub">Sales Pipeline</div>
-            </div>
-          </div>
+      <div className="nav-logo">
+  <div className="nav-logo-img-wrap">
+    <img
+      src="/logo-dark.png"
+      alt="Company Logo"
+      className="nav-logo-image logo-dark"
+    />
+    <img
+      src="/logo-light.png"
+      alt="Company Logo"
+      className="nav-logo-image logo-light"
+    />
+  </div>
+
+  <div className="nav-logo-sub">Sales Pipeline</div>
+</div>
 
           <div className="nav-section-label">Navigation</div>
 
