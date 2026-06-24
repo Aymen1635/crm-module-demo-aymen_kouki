@@ -1,6 +1,6 @@
 # Module CRM
 
-Un module CRM minimal orienté production, construit avec **NestJS 11**, **Next.js 15 (App Router)**, **Prisma 5**, et **PostgreSQL**.
+Un module CRM minimal orienté production, construit avec **NestJS 11**, **Next.js 15 (App Router)**, **Prisma 7**, et **PostgreSQL**.
 
 ---
 
@@ -10,7 +10,7 @@ Un module CRM minimal orienté production, construit avec **NestJS 11**, **Next.
 |---|---|
 | Backend | NestJS 11 + TypeScript strict |
 | Frontend | Next.js 15 (App Router) + TypeScript strict |
-| ORM | Prisma 5 |
+| ORM | Prisma 7 |
 | Base de données | PostgreSQL 15+ |
 | Validation | class-validator + class-transformer |
 

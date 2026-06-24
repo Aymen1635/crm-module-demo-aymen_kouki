@@ -8,12 +8,6 @@ export declare class OpportunitiesService {
     findAll(query: ListOpportunitiesDto): Promise<import("../common/types/paginated.type").PaginatedResult<{
         riskLabel: import("../common/utils/opportunity-risk.util").RiskLabel;
         id: string;
-        title: string;
-        amountCents: number;
-        currency: string;
-        expectedSignatureDate: Date;
-        stage: import(".prisma/client").$Enums.OpportunityStage;
-        lastStageChangeAt: Date;
         createdAt: Date;
         updatedAt: Date;
         client: {
@@ -25,16 +19,16 @@ export declare class OpportunitiesService {
             lastName: string | null;
             email: string;
         };
-    }>>;
-    findOne(id: string): Promise<{
-        riskLabel: import("../common/utils/opportunity-risk.util").RiskLabel;
-        id: string;
         title: string;
         amountCents: number;
         currency: string;
         expectedSignatureDate: Date;
         stage: import(".prisma/client").$Enums.OpportunityStage;
         lastStageChangeAt: Date;
+    }>>;
+    findOne(id: string): Promise<{
+        riskLabel: import("../common/utils/opportunity-risk.util").RiskLabel;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         client: {
@@ -49,16 +43,16 @@ export declare class OpportunitiesService {
             address: string | null;
             notes: string | null;
         };
+        title: string;
+        amountCents: number;
+        currency: string;
+        expectedSignatureDate: Date;
+        stage: import(".prisma/client").$Enums.OpportunityStage;
+        lastStageChangeAt: Date;
     }>;
     create(dto: CreateOpportunityDto): Promise<{
         riskLabel: import("../common/utils/opportunity-risk.util").RiskLabel;
         id: string;
-        title: string;
-        amountCents: number;
-        currency: string;
-        expectedSignatureDate: Date;
-        stage: import(".prisma/client").$Enums.OpportunityStage;
-        lastStageChangeAt: Date;
         createdAt: Date;
         updatedAt: Date;
         client: {
@@ -70,16 +64,16 @@ export declare class OpportunitiesService {
             lastName: string | null;
             email: string;
         };
+        title: string;
+        amountCents: number;
+        currency: string;
+        expectedSignatureDate: Date;
+        stage: import(".prisma/client").$Enums.OpportunityStage;
+        lastStageChangeAt: Date;
     }>;
     update(id: string, dto: UpdateOpportunityDto): Promise<{
         riskLabel: import("../common/utils/opportunity-risk.util").RiskLabel;
         id: string;
-        title: string;
-        amountCents: number;
-        currency: string;
-        expectedSignatureDate: Date;
-        stage: import(".prisma/client").$Enums.OpportunityStage;
-        lastStageChangeAt: Date;
         createdAt: Date;
         updatedAt: Date;
         client: {
@@ -91,6 +85,12 @@ export declare class OpportunitiesService {
             lastName: string | null;
             email: string;
         };
+        title: string;
+        amountCents: number;
+        currency: string;
+        expectedSignatureDate: Date;
+        stage: import(".prisma/client").$Enums.OpportunityStage;
+        lastStageChangeAt: Date;
     }>;
     remove(id: string): Promise<void>;
 }
