@@ -18,7 +18,7 @@ class ListOpportunitiesDto {
         this.sortBy = 'createdAt';
         this.order = 'desc';
         this.page = 1;
-        this.limit = 20;
+        this.limit = 10;
     }
 }
 exports.ListOpportunitiesDto = ListOpportunitiesDto;
@@ -34,10 +34,21 @@ __decorate([
 ], ListOpportunitiesDto.prototype, "clientType", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Transform)(({ value }) => Array.isArray(value) ? value : value ? [value] : undefined),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsIn)(['late', 'stagnant'], { each: true, message: 'riskLabel must be late or stagnant' }),
+    __metadata("design:type", Array)
+], ListOpportunitiesDto.prototype, "riskLabel", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(['createdAt', 'amountCents', 'expectedSignatureDate', 'stage'], {
+        message: 'sortBy must be one of: createdAt, amountCents, expectedSignatureDate, stage',
+    }),
     __metadata("design:type", String)
 ], ListOpportunitiesDto.prototype, "sortBy", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(['asc', 'desc'], { message: 'order must be asc or desc' }),
     __metadata("design:type", String)
 ], ListOpportunitiesDto.prototype, "order", void 0);
 __decorate([

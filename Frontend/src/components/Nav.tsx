@@ -44,18 +44,53 @@ export function Nav() {
   ];
 
   return (
-    <nav className="app-nav" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div>
-        <div className="nav-logo">
-          <div className="nav-logo-icon">⚡</div>
-          <div>
-            <div className="nav-logo-text">CRM</div>
-            <div className="nav-logo-sub">Sales Pipeline</div>
+    <>
+      {/* ─ Desktop sidebar ─ */}
+      <nav className="app-nav">
+        <div>
+          <div className="nav-logo">
+            <div className="nav-logo-icon">⚡</div>
+            <div>
+              <div className="nav-logo-text">CRM</div>
+              <div className="nav-logo-sub">Sales Pipeline</div>
+            </div>
           </div>
+
+          <div className="nav-section-label">Navigation</div>
+
+          {links.map((link) => {
+            const isActive =
+              link.href === '/opportunities'
+                ? pathname === '/opportunities' || pathname === '/'
+                : pathname === link.href;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-link ${isActive ? 'active' : ''}`}
+              >
+                <span className="nav-link-icon">{link.icon}</span>
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
-        <div className="nav-section-label">Navigation</div>
+        <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+          <button
+            onClick={toggleTheme}
+            className="nav-link"
+            style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', outline: 'none' }}
+          >
+            <span className="nav-link-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
+        </div>
+      </nav>
 
+      {/* ─ Mobile bottom tab bar ─ */}
+      <nav className="mobile-nav">
         {links.map((link) => {
           const isActive =
             link.href === '/opportunities'
@@ -66,26 +101,21 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`nav-link ${isActive ? 'active' : ''}`}
+              className={`mobile-nav-item ${isActive ? 'active' : ''}`}
             >
-              <span className="nav-link-icon">{link.icon}</span>
+              <span className="mobile-nav-icon">{link.icon}</span>
               {link.label}
             </Link>
           );
         })}
-      </div>
-
-      {/* Theme Toggle at the bottom */}
-      <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
         <button
           onClick={toggleTheme}
-          className="nav-link"
-          style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', outline: 'none' }}
+          className="mobile-nav-item"
         >
-          <span className="nav-link-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
-          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          <span className="mobile-nav-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+          {theme === 'dark' ? 'Light' : 'Dark'}
         </button>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

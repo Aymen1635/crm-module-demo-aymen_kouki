@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { fetchOpportunities, fetchPipelineSummary } from '@/lib/api';
 import { OpportunityTable } from '@/components/opportunities/OpportunityTable';
 import { OpportunityFilters } from '@/components/opportunities/OpportunityFilters';
+import { AtRiskBar } from '@/components/opportunities/AtRiskBar';
 import { Pagination } from '@/components/opportunities/Pagination';
 import { PipelineSummary } from '@/components/pipeline/PipelineSummary';
 
@@ -30,13 +31,19 @@ export default async function OpportunitiesPage({ searchParams }: PageProps) {
 
   const stage = getString(params.stage);
   const clientType = getString(params.clientType);
+  const riskLabelRaw = params.riskLabel;
+  const riskLabel: string[] = Array.isArray(riskLabelRaw)
+    ? riskLabelRaw
+    : riskLabelRaw
+    ? [riskLabelRaw]
+    : [];
   const sortBy = getString(params.sortBy, 'createdAt');
   const order = getString(params.order, 'desc');
   const page = parseInt(getString(params.page, '1'), 10);
   const limit = 10;
 
   // Build query params for API
-  const apiParams: Record<string, string> = {
+  const apiParams: Record<string, string | string[]> = {
     sortBy,
     order,
     page: String(page),
@@ -44,6 +51,7 @@ export default async function OpportunitiesPage({ searchParams }: PageProps) {
   };
   if (stage) apiParams.stage = stage;
   if (clientType) apiParams.clientType = clientType;
+  if (riskLabel.length > 0) apiParams.riskLabel = riskLabel;
 
   // Fetch both in parallel
   const [result, pipeline] = await Promise.all([
@@ -72,6 +80,11 @@ export default async function OpportunitiesPage({ searchParams }: PageProps) {
         </div>
         <PipelineSummary summary={pipeline} />
       </div>
+
+      {/* Proactive alert bar — shown when at-risk deals exist and no risk filter is active */}
+      <Suspense fallback={null}>
+        <AtRiskBar summary={pipeline} />
+      </Suspense>
 
       {/* Filters — client component wrapped in Suspense for useSearchParams */}
       <Suspense fallback={<div className="filters-bar"><span className="text-muted text-sm">Loading filters…</span></div>}>

@@ -99,6 +99,8 @@ export interface PipelineSummary {
   totalActiveCents: number;
   atRiskCents: number;
   atRiskCount: number;
+  stagnantCents: number;
+  stagnantCount: number;
 }
 
 // ─── API Payloads ───────────────────────────────────────────────

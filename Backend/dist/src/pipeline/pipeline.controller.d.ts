@@ -11,5 +11,7 @@ export declare class PipelineController {
         totalActiveCents: number;
         atRiskCents: number;
         atRiskCount: number;
+        stagnantCents: number;
+        stagnantCount: number;
     }>;
 }

@@ -1,136 +1,139 @@
-# CRM Take-Home
+# Module CRM
 
-A minimal, production-oriented CRM module built with **NestJS**, **Next.js App Router**, **Prisma**, and **PostgreSQL**.
+Un module CRM minimal orienté production, construit avec **NestJS 11**, **Next.js 15 (App Router)**, **Prisma 5**, et **PostgreSQL**.
 
 ---
 
-## Stack
+## Stack Technique
 
-| Layer | Technology |
+| Couche | Technologie |
 |---|---|
-| Backend | NestJS 10 + TypeScript strict |
-| Frontend | Next.js 14 (App Router) + TypeScript strict |
+| Backend | NestJS 11 + TypeScript strict |
+| Frontend | Next.js 15 (App Router) + TypeScript strict |
 | ORM | Prisma 5 |
-| Database | PostgreSQL 15+ |
+| Base de données | PostgreSQL 15+ |
 | Validation | class-validator + class-transformer |
 
 ---
 
-## Prerequisites
+## Prérequis
 
 - Node.js ≥ 20
 - npm ≥ 10
-- PostgreSQL 15+ running locally **or** Docker
+- Docker (recommandé pour lancer PostgreSQL facilement) ou PostgreSQL 15+ en local
 
 ---
 
-## Quick Start
+## Démarrage Rapide (Lancement en - de 5 min)
 
-### 1 — Clone & install
+Suivez ces étapes simples pour lancer le projet :
+
+### 1 — Installer les dépendances
 
 ```bash
-git clone <repo-url>
-cd crm
-npm install          # installs root + all workspaces
+# À la racine du projet, installez toutes les dépendances (backend et frontend)
+npm install
 ```
 
-### 2 — Environment Variables
+### 2 — Configurer l'environnement
 
-You need to set up environment variables for both the backend and frontend.
+Les variables d'environnement sont nécessaires pour connecter la base de données et l'API.
 
-**Backend (`Backend/.env`):**
-Create a `.env` file inside the `Backend/` directory:
+**Backend (`Backend/.env`) :**
+Créez un fichier `.env` dans le dossier `Backend/` avec ce contenu :
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/crm_dev"
 PORT=3001
 STAGNANT_THRESHOLD_DAYS=14
 ```
 
-**Frontend (`Frontend/.env.local`):**
-Create a `.env.local` file inside the `Frontend/` directory:
+**Frontend (`Frontend/.env.local`) :**
+Créez un fichier `.env.local` dans le dossier `Frontend/` avec ce contenu :
 ```env
 NEXT_PUBLIC_API_URL="http://localhost:3001"
 ```
 
-### 3 — Database
+### 3 — Lancer la base de données (PostgreSQL)
 
 ```bash
-# Option A: Docker (recommended)
+# Démarre une instance PostgreSQL via Docker en arrière-plan
 docker compose up -d
+```
+*(Si vous avez déjà PostgreSQL d'installé en local, assurez-vous juste que l'URL dans `Backend/.env` est correcte).*
 
-# Option B: existing Postgres
-# Make sure DATABASE_URL in .env is correct
+### 4 — Initialiser la base de données
+
+Cette étape va créer les tables et ajouter des données de test (clients et opportunités) :
+```bash
+npm run db:migrate   # Applique les migrations Prisma
+npm run db:seed      # Injecte les fausses données
 ```
 
-### 4 — Run migrations & seed
+### 5 — Démarrer l'application
 
 ```bash
-npm run db:migrate   # runs prisma migrate dev
-npm run db:seed      # seeds sample clients + opportunities
+# Lance le backend (port 3001) et le frontend (port 3000) en même temps
+npm run dev
 ```
 
-### 5 — Start dev servers
+> **Note :** Le frontend utilisera automatiquement `wait-on` pour attendre que le backend soit prêt avant de démarrer, évitant ainsi les erreurs au premier lancement.
 
-```bash
-npm run dev          # starts backend (3001) and frontend (3000) concurrently
-```
-
-Open [http://localhost:3000](http://localhost:3000).
+Ouvrez ensuite [http://localhost:3000](http://localhost:3000) dans votre navigateur ! 🎉
 
 ---
 
-## Individual workspace commands
+## Commandes Utiles
+
+Si vous souhaitez lancer les environnements séparément :
 
 ```bash
-# Backend only
-npm run dev:backend       # NestJS on :3001
-npm run db:migrate        # prisma migrate dev
-npm run db:seed           # seed script
-npm run db:studio         # prisma studio
+# Backend uniquement
+npm run dev:backend       # Lance NestJS sur :3001
+npm run db:studio         # Ouvre Prisma Studio pour explorer la base de données
 
-# Frontend only
-npm run dev:frontend      # Next.js on :3000
+# Frontend uniquement
+npm run dev:frontend      # Lance Next.js sur :3000 (attend le backend)
 ```
 
 ---
 
-## Project structure
+## Structure du projet
 
-```
-crm/
-├── Backend/              # NestJS API
-│   ├── prisma/           # schema.prisma + migrations + seed
+```text
+crm-module-demo-aymen/
+├── Backend/              # API NestJS
+│   ├── prisma/           # Schéma Prisma, migrations et seed
 │   └── src/
-│       ├── clients/
-│       ├── opportunities/
-│       ├── pipeline/
-│       ├── prisma/       # PrismaService
-│       └── common/       # filters, pipes, types
-└── Frontend/             # Next.js App Router
+│       ├── clients/      # Gestion des clients
+│       ├── opportunities/# Gestion des opportunités
+│       ├── pipeline/     # Agrégation des données
+│       ├── prisma/       # Service Prisma
+│       └── common/       # Filtres, types et utilitaires partagés
+└── Frontend/             # Interface Next.js (App Router)
     └── src/
-        ├── app/
-        ├── components/
-        ├── lib/
-        └── hooks/
+        ├── app/          # Pages et layouts de l'application
+        ├── components/   # Composants réutilisables (UI)
+        ├── lib/          # Client API
+        └── hooks/        # Hooks React personnalisés
 ```
 
 ---
 
-## Key design decisions
+## Décisions Techniques
 
-See [decisions.md](./decisions.md) for the full rationale. Summary:
+Consultez le fichier [decisions.md](./decisions.md) pour lire en détail les choix d'architecture. Voici un résumé :
 
-- **Single-table clients** — one `clients` table with a `type` discriminant (`COMPANY | INDIVIDUAL`)
-- **Soft delete** — `deletedAt` timestamp; nothing is ever hard-deleted in normal flow
-- **Amount in cents** — `amountCents: Int` avoids float precision issues (note: capped at ~214k EUR; upgrade to `BigInt` for larger deals)
-- **Risk flags computed in service layer** — `late` (past expected date, not closed) and `stagnant` (no stage change in 14 days, configurable via `STAGNANT_THRESHOLD_DAYS`)
-- **Pipeline aggregation** — `GET /pipeline/summary` returns totals per stage + at-risk value
+- **Clients (Table unique)** — Une seule table `clients` avec un champ discriminant `type` (`COMPANY` ou `INDIVIDUAL`).
+- **Suppression logique (Soft delete)** — Un horodatage `deletedAt` est utilisé ; rien n'est physiquement supprimé de la base de données.
+- **Montants en centimes** — Le champ `amountCents` (entier) évite les erreurs de précision liées aux nombres flottants.
+- **Indicateurs de risque** — Les états "En retard" (`late`) ou "Stagnant" (`stagnant` > 14 jours) sont calculés dynamiquement par le service.
+- **Agrégation Pipeline** — `GET /api/pipeline/summary` retourne les totaux par étape et la valeur à risque.
 
 ---
 
-## Known limitations (prototype scope)
+## Limitations Connues (Périmètre Prototype)
 
-- No authentication / authorization
-- `amountCents` is a 32-bit `Int` — sufficient for the prototype, use `BigInt` for production
-- Staleness threshold (14 days) is env-configurable but not user-editable via UI
-- No physical delete endpoint
+- Aucune authentification / gestion des autorisations.
+- Le champ `amountCents` est un entier 32-bit (suffisant pour le test, prévoir un `BigInt` pour la production).
+- Le délai de stagnation (14 jours) n'est pas modifiable depuis l'interface utilisateur.
+- Aucune suppression physique n'est exposée via l'API.

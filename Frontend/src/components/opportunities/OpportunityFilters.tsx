@@ -15,6 +15,7 @@ export function OpportunityFilters() {
 
   const currentStage = searchParams?.get('stage') ?? '';
   const currentClientType = searchParams?.get('clientType') ?? '';
+  const currentRiskLabels = searchParams?.getAll('riskLabel') ?? [];
   const currentSortBy = searchParams?.get('sortBy') ?? 'createdAt';
   const currentOrder = searchParams?.get('order') ?? 'desc';
 
@@ -34,7 +35,20 @@ export function OpportunityFilters() {
     router.push(pathname ?? '/opportunities');
   }
 
-  const hasActiveFilters = currentStage || currentClientType;
+  function toggleRiskLabel(value: string) {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    const current = params.getAll('riskLabel');
+    params.delete('riskLabel');
+    if (current.includes(value)) {
+      current.filter((v) => v !== value).forEach((v) => params.append('riskLabel', v));
+    } else {
+      [...current, value].forEach((v) => params.append('riskLabel', v));
+    }
+    params.delete('page');
+    router.push(`${pathname ?? '/opportunities'}?${params.toString()}`);
+  }
+
+  const hasActiveFilters = currentStage || currentClientType || currentRiskLabels.length > 0;
 
   return (
     <div className="filters-bar">
@@ -67,6 +81,23 @@ export function OpportunityFilters() {
           </option>
         ))}
       </select>
+
+      <div className="risk-chip-group" role="group" aria-label="Filter by risk status">
+        <button
+          type="button"
+          className={`risk-chip risk-chip-late ${currentRiskLabels.includes('late') ? 'active' : ''}`}
+          onClick={() => toggleRiskLabel('late')}
+        >
+          Overdue
+        </button>
+        <button
+          type="button"
+          className={`risk-chip risk-chip-stagnant ${currentRiskLabels.includes('stagnant') ? 'active' : ''}`}
+          onClick={() => toggleRiskLabel('stagnant')}
+        >
+          Stagnant
+        </button>
+      </div>
 
       <span className="filters-label" style={{ marginLeft: '8px' }}>
         Sort

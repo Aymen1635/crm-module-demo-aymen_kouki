@@ -40,6 +40,14 @@ export function PipelineSummary({ summary }: PipelineSummaryProps) {
           <div className="pipeline-stat-sub">{summary.atRiskCount} deal{summary.atRiskCount !== 1 ? 's' : ''}</div>
         </div>
 
+        <div className={`pipeline-stat ${summary.stagnantCount > 0 ? 'warning' : ''}`}>
+          <div className="pipeline-stat-label">Stagnant</div>
+          <div className="pipeline-stat-value">
+            {formatCurrencyShort(summary.stagnantCents)}
+          </div>
+          <div className="pipeline-stat-sub">{summary.stagnantCount} deal{summary.stagnantCount !== 1 ? 's' : ''}</div>
+        </div>
+
         {summary.stages
           .filter((s) => s.stage === 'WON' || s.stage === 'LOST')
           .map((s) => (

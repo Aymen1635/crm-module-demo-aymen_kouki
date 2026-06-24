@@ -38,6 +38,8 @@ export class PipelineService {
     let totalActiveCents = 0;
     let atRiskCents = 0;
     let atRiskCount = 0;
+    let stagnantCents = 0;
+    let stagnantCount = 0;
 
     for (const opp of activeOpportunities) {
       const entry = stageMap.get(opp.stage)!;
@@ -52,11 +54,13 @@ export class PipelineService {
         totalActiveCents += opp.amountCents;
       }
 
-      // At-risk = late opportunities only (highest priority risk label)
       const risk = computeRiskLabel(opp);
       if (risk === 'late') {
         atRiskCents += opp.amountCents;
         atRiskCount += 1;
+      } else if (risk === 'stagnant') {
+        stagnantCents += opp.amountCents;
+        stagnantCount += 1;
       }
     }
 
@@ -70,6 +74,8 @@ export class PipelineService {
       totalActiveCents,
       atRiskCents,
       atRiskCount,
+      stagnantCents,
+      stagnantCount,
     };
   }
 }

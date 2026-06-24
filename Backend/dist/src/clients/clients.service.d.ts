@@ -9,6 +9,7 @@ export declare class ClientsService {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -19,6 +20,7 @@ export declare class ClientsService {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -33,6 +35,7 @@ export declare class ClientsService {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -47,6 +50,7 @@ export declare class ClientsService {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -61,6 +65,7 @@ export declare class ClientsService {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;

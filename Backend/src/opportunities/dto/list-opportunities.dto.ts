@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
+  IsArray,
   IsEnum,
   IsIn,
   IsInt,
@@ -8,6 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { ClientType, OpportunityStage } from '@prisma/client';
+import type { RiskLabel } from '../../common/utils/opportunity-risk.util';
 
 export type SortField =
   | 'createdAt'
@@ -25,6 +27,16 @@ export class ListOpportunitiesDto {
   @IsOptional()
   @IsEnum(ClientType)
   clientType?: ClientType;
+
+  // Accepts ?riskLabel=late, ?riskLabel=stagnant, or both repeated.
+  // Normalised to an array by the transform so the service uses OR logic.
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    Array.isArray(value) ? value : value ? [value] : undefined,
+  )
+  @IsArray()
+  @IsIn(['late', 'stagnant'], { each: true, message: 'riskLabel must be late or stagnant' })
+  riskLabel?: RiskLabel[];
 
   @IsOptional()
   @IsIn(['createdAt', 'amountCents', 'expectedSignatureDate', 'stage'], {

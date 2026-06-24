@@ -1,6 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/opportunities/page": "app/opportunities/page.js",
-  "/opportunities/new/page": "app/opportunities/new/page.js",
-  "/opportunities/[id]/page": "app/opportunities/[id]/page.js"
-}

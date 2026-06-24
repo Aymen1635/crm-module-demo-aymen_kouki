@@ -11,5 +11,7 @@ export declare class PipelineService {
         totalActiveCents: number;
         atRiskCents: number;
         atRiskCount: number;
+        stagnantCents: number;
+        stagnantCount: number;
     }>;
 }

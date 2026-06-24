@@ -36,6 +36,8 @@ let PipelineService = class PipelineService {
         let totalActiveCents = 0;
         let atRiskCents = 0;
         let atRiskCount = 0;
+        let stagnantCents = 0;
+        let stagnantCount = 0;
         for (const opp of activeOpportunities) {
             const entry = stageMap.get(opp.stage);
             entry.count += 1;
@@ -49,6 +51,10 @@ let PipelineService = class PipelineService {
                 atRiskCents += opp.amountCents;
                 atRiskCount += 1;
             }
+            else if (risk === 'stagnant') {
+                stagnantCents += opp.amountCents;
+                stagnantCount += 1;
+            }
         }
         const stages = ALL_STAGES.map((stage) => ({
             stage,
@@ -59,6 +65,8 @@ let PipelineService = class PipelineService {
             totalActiveCents,
             atRiskCents,
             atRiskCount,
+            stagnantCents,
+            stagnantCount,
         };
     }
 };

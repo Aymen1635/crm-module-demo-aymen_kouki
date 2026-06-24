@@ -17,15 +17,7 @@ const common_1 = require("@nestjs/common");
 const clients_service_1 = require("./clients.service");
 const create_client_dto_1 = require("./dto/create-client.dto");
 const update_client_dto_1 = require("./dto/update-client.dto");
-const client_1 = require("@prisma/client");
-const class_validator_1 = require("class-validator");
-class ClientFilterQuery {
-}
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.ClientType),
-    __metadata("design:type", String)
-], ClientFilterQuery.prototype, "type", void 0);
+const client_filter_dto_1 = require("./dto/client-filter.dto");
 let ClientsController = class ClientsController {
     constructor(clientsService) {
         this.clientsService = clientsService;
@@ -51,7 +43,7 @@ __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [ClientFilterQuery]),
+    __metadata("design:paramtypes", [client_filter_dto_1.ClientFilterDto]),
     __metadata("design:returntype", void 0)
 ], ClientsController.prototype, "findAll", null);
 __decorate([

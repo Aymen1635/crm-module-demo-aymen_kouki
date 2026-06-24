@@ -53,17 +53,51 @@ export class OpportunitiesService {
     const {
       stage,
       clientType,
+      riskLabel,
       sortBy = 'createdAt',
       order = 'desc',
       page = 1,
       limit = 20,
     } = query;
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thresholdDays = parseInt(process.env.STAGNANT_THRESHOLD_DAYS ?? '14', 10);
+    const stagnantCutoff = new Date(Date.now() - thresholdDays * 24 * 60 * 60 * 1000);
+    const closedStages = [OpportunityStage.WON, OpportunityStage.LOST];
+
     const where: Prisma.OpportunityWhereInput = {
       deletedAt: null,
       ...(stage ? { stage } : {}),
       ...(clientType ? { client: { type: clientType, deletedAt: null } } : {}),
     };
+
+    // Build per-label DB conditions and OR them together.
+    // We use `where.AND` instead of direct assignment to avoid clobbering the
+    // stage filter that may already be set above.
+    if (riskLabel?.length) {
+      const riskConditions: Prisma.OpportunityWhereInput[] = [];
+
+      if (riskLabel.includes('late')) {
+        riskConditions.push({
+          expectedSignatureDate: { lt: today },
+          stage: { notIn: closedStages },
+        });
+      }
+
+      if (riskLabel.includes('stagnant')) {
+        riskConditions.push({
+          lastStageChangeAt: { lt: stagnantCutoff },
+          expectedSignatureDate: { gte: today },
+          stage: { notIn: closedStages },
+        });
+      }
+
+      where.AND =
+        riskConditions.length === 1
+          ? riskConditions
+          : [{ OR: riskConditions }];
+    }
 
     // Validate sortBy to prevent injection
     const allowedSortFields: Record<string, Prisma.OpportunityOrderByWithRelationInput> = {

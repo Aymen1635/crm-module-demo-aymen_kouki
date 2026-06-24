@@ -27,6 +27,7 @@ let ClientsService = class ClientsService {
                 id: true,
                 type: true,
                 companyName: true,
+                legalId: true,
                 firstName: true,
                 lastName: true,
                 email: true,
@@ -49,6 +50,7 @@ let ClientsService = class ClientsService {
             data: {
                 type: dto.type,
                 companyName: dto.companyName,
+                legalId: dto.legalId,
                 firstName: dto.firstName,
                 lastName: dto.lastName,
                 email: dto.email,
@@ -65,6 +67,7 @@ let ClientsService = class ClientsService {
             data: {
                 ...(dto.type !== undefined && { type: dto.type }),
                 ...(dto.companyName !== undefined && { companyName: dto.companyName }),
+                ...(dto.legalId !== undefined && { legalId: dto.legalId }),
                 ...(dto.firstName !== undefined && { firstName: dto.firstName }),
                 ...(dto.lastName !== undefined && { lastName: dto.lastName }),
                 ...(dto.email !== undefined && { email: dto.email }),

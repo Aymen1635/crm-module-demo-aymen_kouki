@@ -22,18 +22,28 @@ __decorate([
 __decorate([
     (0, class_validator_1.ValidateIf)((o) => o.type === client_1.ClientType.COMPANY),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Company name is required for company clients.' }),
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateClientDto.prototype, "companyName", void 0);
 __decorate([
+    (0, class_validator_1.ValidateIf)((o) => o.type === client_1.ClientType.COMPANY),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(50),
+    __metadata("design:type", String)
+], CreateClientDto.prototype, "legalId", void 0);
+__decorate([
     (0, class_validator_1.ValidateIf)((o) => o.type === client_1.ClientType.INDIVIDUAL),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'First name is required for individual clients.' }),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateClientDto.prototype, "firstName", void 0);
 __decorate([
     (0, class_validator_1.ValidateIf)((o) => o.type === client_1.ClientType.INDIVIDUAL),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Last name is required for individual clients.' }),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateClientDto.prototype, "lastName", void 0);

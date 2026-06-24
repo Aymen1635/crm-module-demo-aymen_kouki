@@ -1,17 +1,15 @@
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ClientType } from '@prisma/client';
-declare class ClientFilterQuery {
-    type?: ClientType;
-}
+import { ClientFilterDto } from './dto/client-filter.dto';
 export declare class ClientsController {
     private readonly clientsService;
     constructor(clientsService: ClientsService);
-    findAll(query: ClientFilterQuery): Promise<{
+    findAll(query: ClientFilterDto): Promise<{
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -22,6 +20,7 @@ export declare class ClientsController {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -36,6 +35,7 @@ export declare class ClientsController {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -50,6 +50,7 @@ export declare class ClientsController {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -64,6 +65,7 @@ export declare class ClientsController {
         id: string;
         type: import(".prisma/client").$Enums.ClientType;
         companyName: string | null;
+        legalId: string | null;
         firstName: string | null;
         lastName: string | null;
         email: string;
@@ -75,4 +77,3 @@ export declare class ClientsController {
         updatedAt: Date;
     }>;
 }
-export {};

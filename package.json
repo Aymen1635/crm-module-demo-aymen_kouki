@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run start:dev --workspace=Backend",
-    "dev:frontend": "npm run dev --workspace=Frontend",
+    "dev:frontend": "wait-on tcp:3001 && npm run dev --workspace=Frontend",
     "db:migrate": "npm run prisma:migrate --workspace=Backend",
     "db:seed": "npm run prisma:seed --workspace=Backend",
     "db:studio": "npm run prisma:studio --workspace=Backend",
@@ -17,6 +17,7 @@
     "lint": "npm run lint --workspace=Backend && npm run lint --workspace=Frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "wait-on": "^9.0.10"
   }
 }

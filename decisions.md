@@ -114,7 +114,10 @@ L'indicateur le plus utile à afficher est un résumé compact du pipeline, comp
 - la valeur totale par étape.
 - le nombre d'opportunités par étape.
 - la valeur totale du pipeline actif (hors WON/LOST).
-- la valeur "à risque", c'est-à-dire les opportunités en retard.
+- la valeur "à risque" (`atRiskCents` / `atRiskCount`) : opportunités en retard.
+- la valeur "stagnante" (`stagnantCents` / `stagnantCount`) : opportunités stagnantes (non-retard).
+
+Les deux catégories de risque sont distinguées dans le résumé car elles appellent des actions différentes : une opportunité en retard doit être clôturée ou escaladée, une opportunité stagnante doit être relancée.
 
 Ce format donne à la fois une vision business et une lecture opérationnelle rapide.
 
@@ -129,8 +132,17 @@ L'implémentation actuelle charge toutes les opportunités actives en mémoire p
 L'endpoint de liste expose :
 - filtrage par `stage`.
 - filtrage par `clientType`.
+- filtrage par `riskLabel` (multi-valeur : `?riskLabel=late&riskLabel=stagnant`) — chaque valeur génère un prédicat SQL distinct, les deux sont combinés en OR. La pagination reste cohérente car le filtre est en base, pas en mémoire.
 - tri par `createdAt`, `amountCents`, `expectedSignatureDate`, ou `stage`.
 - pagination côté serveur (`page/limit`, défaut 10 par page).
+
+### Visibilité des opportunités à problème
+
+Le filtre `riskLabel` seul ne suffit pas : il repose sur une action utilisateur, or quelqu'un qui ne connaît pas le filtre ne verra jamais les opportunités en retard (elles peuvent être page 5).
+
+J'ai adopté une double approche :
+1. **Barre d'alerte proactive** (`AtRiskBar`) — affichée en haut de la liste quand des opportunités à problème existent **et** qu'aucun filtre de risque n'est actif. Elle résume le nombre de deals en retard et stagnants avec des liens d'action directe. Disparaît dès qu'un filtre est appliqué (évite la redondance).
+2. **Chips de filtre multi-sélection** — remplace le `<select>` unique. Les deux labels (`Overdue`, `Stagnant`) sont toggleables indépendamment, ce qui permet de voir les deux ensembles sans forcer un mode exclusif.
 
 Je choisis une pagination `page/limit` pour la lisibilité dans un test take-home. Si le dataset grossit, une pagination par curseur pourra être ajoutée plus tard. 
 
@@ -210,6 +222,10 @@ Pour rester dans le périmètre du test, je ne rajoute pas :
 - un dépôt unique pour tout le code.
 - un README de démarrage rapide.
 - des commits atomiques et descriptifs.
+
+## Synchronisation Frontend/Backend en développement
+
+Afin d'éviter des erreurs de type `ECONNREFUSED` lors du rendu côté serveur (SSR) par Next.js (qui démarre souvent plus vite que NestJS), j'ai ajouté `wait-on` dans les scripts de développement. Le script `dev:frontend` attend que le backend écoute sur le port 3001 (`tcp:3001`) avant de lancer le serveur Next.js. Cela garantit un démarrage propre et sans erreurs lors du lancement de l'application en mode développement.
 
 ## Résumé des choix
 

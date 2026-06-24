@@ -2,6 +2,7 @@ import { ClientType } from '@prisma/client';
 export declare class CreateClientDto {
     type: ClientType;
     companyName?: string;
+    legalId?: string;
     firstName?: string;
     lastName?: string;
     email: string;

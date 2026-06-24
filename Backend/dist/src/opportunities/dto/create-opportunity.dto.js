@@ -25,6 +25,7 @@ __decorate([
 ], CreateOpportunityDto.prototype, "clientId", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Title is required.' }),
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateOpportunityDto.prototype, "title", void 0);

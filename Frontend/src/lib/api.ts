@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type {
   PaginatedResult,
   OpportunityListItem,
@@ -41,41 +42,75 @@ async function request<T>(
 ): Promise<T> {
   const url = apiUrl(path);
 
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    cache: 'no-store', // always fresh data
-  });
+  const maxRetries = 5;
+  const retryDelay = 2000;
+  let lastError: unknown;
 
-  // 204 No Content (e.g. DELETE)
-  if (res.status === 204) {
-    return undefined as T;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        cache: 'no-store', // always fresh data
+      });
+
+      // 204 No Content (e.g. DELETE)
+      if (res.status === 204) {
+        return undefined as T;
+      }
+
+      const body = await res.json();
+
+      if (!res.ok) {
+        throw new ApiClientError(res.status, body as ApiError);
+      }
+
+      return body as T;
+    } catch (err: any) {
+      lastError = err;
+      // Retry on network errors (like ECONNREFUSED) in server components
+      const isNetworkError = 
+        err?.message === 'fetch failed' || 
+        err?.cause?.code === 'ECONNREFUSED';
+
+      if (attempt < maxRetries && isNetworkError) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const body = await res.json();
-
-  if (!res.ok) {
-    throw new ApiClientError(res.status, body as ApiError);
-  }
-
-  return body as T;
+  throw lastError;
 }
 
 /* ─── Opportunities ──────────────────────────────────────────── */
 
 export function fetchOpportunities(
-  params?: Record<string, string>,
+  params?: Record<string, string | string[]>,
 ): Promise<PaginatedResult<OpportunityListItem>> {
-  const qs = params ? `?${new URLSearchParams(params).toString()}` : '';
-  return request(`/opportunities${qs}`);
+  if (!params) return request('/opportunities');
+  const qs = new URLSearchParams();
+  for (const [key, val] of Object.entries(params)) {
+    if (Array.isArray(val)) {
+      val.forEach((v) => qs.append(key, v));
+    } else {
+      qs.set(key, val);
+    }
+  }
+  return request(`/opportunities?${qs.toString()}`);
 }
 
-export function fetchOpportunity(id: string): Promise<OpportunityDetail> {
+// cache() deduplicates calls with the same id within a single server render,
+// so generateMetadata and the page body share one HTTP request.
+export const fetchOpportunity = cache(function fetchOpportunityImpl(
+  id: string,
+): Promise<OpportunityDetail> {
   return request(`/opportunities/${id}`);
-}
+});
 
 export function createOpportunity(
   data: CreateOpportunityPayload,

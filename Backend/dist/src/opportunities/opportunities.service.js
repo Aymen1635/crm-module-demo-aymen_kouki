@@ -30,6 +30,7 @@ const OPPORTUNITY_SELECT = {
             id: true,
             type: true,
             companyName: true,
+            legalId: true,
             firstName: true,
             lastName: true,
             email: true,
@@ -47,12 +48,37 @@ let OpportunitiesService = class OpportunitiesService {
         this.prisma = prisma;
     }
     async findAll(query) {
-        const { stage, clientType, sortBy = 'createdAt', order = 'desc', page = 1, limit = 20, } = query;
+        const { stage, clientType, riskLabel, sortBy = 'createdAt', order = 'desc', page = 1, limit = 20, } = query;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thresholdDays = parseInt(process.env.STAGNANT_THRESHOLD_DAYS ?? '14', 10);
+        const stagnantCutoff = new Date(Date.now() - thresholdDays * 24 * 60 * 60 * 1000);
+        const closedStages = [client_1.OpportunityStage.WON, client_1.OpportunityStage.LOST];
         const where = {
             deletedAt: null,
             ...(stage ? { stage } : {}),
             ...(clientType ? { client: { type: clientType, deletedAt: null } } : {}),
         };
+        if (riskLabel?.length) {
+            const riskConditions = [];
+            if (riskLabel.includes('late')) {
+                riskConditions.push({
+                    expectedSignatureDate: { lt: today },
+                    stage: { notIn: closedStages },
+                });
+            }
+            if (riskLabel.includes('stagnant')) {
+                riskConditions.push({
+                    lastStageChangeAt: { lt: stagnantCutoff },
+                    expectedSignatureDate: { gte: today },
+                    stage: { notIn: closedStages },
+                });
+            }
+            where.AND =
+                riskConditions.length === 1
+                    ? riskConditions
+                    : [{ OR: riskConditions }];
+        }
         const allowedSortFields = {
             createdAt: { createdAt: order },
             amountCents: { amountCents: order },
@@ -82,6 +108,7 @@ let OpportunitiesService = class OpportunitiesService {
                         id: true,
                         type: true,
                         companyName: true,
+                        legalId: true,
                         firstName: true,
                         lastName: true,
                         email: true,
