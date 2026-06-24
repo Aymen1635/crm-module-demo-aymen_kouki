@@ -11,7 +11,7 @@ export function DeleteButton({ opportunityId }: { opportunityId: string }) {
   async function handleDelete() {
     if (
       !confirm(
-        'Are you sure you want to delete this opportunity? This cannot be undone.',
+      'Are you sure you want to delete this opportunity?',
       )
     ) {
       return;

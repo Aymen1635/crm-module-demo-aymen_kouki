@@ -18,6 +18,7 @@ export interface Client {
   id: string;
   type: ClientType;
   companyName: string | null;
+  legalId: string | null;
   firstName: string | null;
   lastName: string | null;
   email: string;
@@ -32,6 +33,7 @@ export interface ClientSummary {
   id: string;
   type: ClientType;
   companyName: string | null;
+  legalId: string | null;
   firstName: string | null;
   lastName: string | null;
   email: string;
@@ -44,6 +46,7 @@ export interface OpportunityClient {
   id: string;
   type: ClientType;
   companyName: string | null;
+  legalId: string | null;
   firstName: string | null;
   lastName: string | null;
   email: string;
@@ -120,6 +123,7 @@ export interface UpdateOpportunityPayload {
 export interface CreateClientPayload {
   type: ClientType;
   companyName?: string;
+  legalId?: string;
   firstName?: string;
   lastName?: string;
   email: string;

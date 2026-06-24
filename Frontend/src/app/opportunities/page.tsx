@@ -33,7 +33,7 @@ export default async function OpportunitiesPage({ searchParams }: PageProps) {
   const sortBy = getString(params.sortBy, 'createdAt');
   const order = getString(params.order, 'desc');
   const page = parseInt(getString(params.page, '1'), 10);
-  const limit = 20;
+  const limit = 10;
 
   // Build query params for API
   const apiParams: Record<string, string> = {

@@ -2,6 +2,7 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
@@ -15,6 +16,7 @@ export class CreateOpportunityDto {
   clientId!: string;
 
   @IsString()
+  @IsNotEmpty({ message: 'Title is required.' })
   @MaxLength(255)
   title!: string;
 

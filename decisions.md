@@ -4,35 +4,35 @@ Ce document explique les hypothèses, arbitrages et choix techniques retenus pou
 
 ## Objectif
 
-Le besoin métier est volontairement imprécis. J’ai donc transformé la demande en un petit produit cohérent, livrable rapidement, mais suffisamment propre pour être repris par une équipe. Le but n’est pas de sur-concevoir, mais de faire des choix explicites, stables et faciles à maintenir. 
+Le besoin métier est volontairement imprécis. J'ai donc transformé la demande en un petit produit cohérent, livrable rapidement, mais suffisamment propre pour être repris par une équipe. Le but n'est pas de sur-concevoir, mais de faire des choix explicites, stables et faciles à maintenir. 
 
 ## Périmètre retenu
 
-Le module couvre deux entités principales : `Client` et `Opportunity`. Un client peut être une entreprise ou un particulier, et une opportunité appartient à un seul client. Le produit expose un CRUD d’opportunités, une liste filtrable/paginée, un endpoint d’agrégation pour le pipeline, et une interface Next.js pour naviguer entre liste, détail et formulaire. 
+Le module couvre deux entités principales : `Client` et `Opportunity`. Un client peut être une entreprise ou un particulier, et une opportunité appartient à un seul client. Le produit expose un CRUD d'opportunités, une liste filtrable/paginée, un endpoint d'agrégation pour le pipeline, et une interface Next.js pour naviguer entre liste, détail et formulaire. 
 
 ## Modèle client
 
-J’ai choisi un modèle à table unique pour les clients, avec un champ discriminant `type` valant `company` ou `individual`. Ce choix simplifie les requêtes, les relations Prisma, les filtres côté API, et l’affichage dans l’UI. Il évite aussi de multiplier les joins pour un périmètre aussi réduit. 
+J'ai choisi un modèle à table unique pour les clients, avec un champ discriminant `type` valant `COMPANY` ou `INDIVIDUAL`. Ce choix simplifie les requêtes, les relations Prisma, les filtres côté API, et l'affichage dans l'UI. Il évite aussi de multiplier les joins pour un périmètre aussi réduit. 
 
 ### Champs pour une entreprise
 
 Pour une entreprise, je retiens les champs suivants :
-- `companyName`.
-- `legalId` ou `siret` selon le besoin.
-- `contactEmail`.
-- `contactPhone`.
-- `address`.
-- `notes` optionnel.
+- `companyName` — nom commercial, obligatoire pour les entreprises.
+- `legalId` — identifiant légal (SIRET en France), optionnel mais spécifique aux entreprises. Ce champ est absent chez les particuliers, ce qui constitue la principale différence de modèle entre les deux types de clients.
+- `email` — partagé avec les particuliers, il représente l'email de contact principal.
+- `phone` — partagé, optionnel.
+- `address` — partagé, optionnel.
+- `notes` — partagé, optionnel.
 
 ### Champs pour un particulier
 
 Pour un particulier, je retiens les champs suivants :
-- `firstName`.
-- `lastName`.
-- `email`.
-- `phone`.
-- `address`.
-- `notes` optionnel.
+- `firstName` — obligatoire pour les particuliers.
+- `lastName` — obligatoire pour les particuliers.
+- `email` — partagé.
+- `phone` — partagé, optionnel.
+- `address` — partagé, optionnel.
+- `notes` — partagé, optionnel.
 
 ### Champs communs
 
@@ -43,13 +43,17 @@ Les deux types partagent :
 - `updatedAt`.
 - `deletedAt`.
 
+### Justification du modèle à table unique
+
+Les champs `companyName` et `legalId` sont `null` pour les particuliers, et `firstName`/`lastName` sont `null` pour les entreprises. La validation côté DTO enforce les champs obligatoires selon le type (`@ValidateIf`). Ce compromis est acceptable pour ce périmètre : si les deux types devaient avoir des comportements très différents (pipelines distincts, relations différentes), un modèle polymorphique avec tables séparées serait justifié.
+
 ## Modèle opportunité
 
 Une opportunité contient :
 - `id`.
 - `clientId`.
 - `title`.
-- `amount`.
+- `amountCents`.
 - `currency`.
 - `expectedSignatureDate`.
 - `stage`.
@@ -58,148 +62,148 @@ Une opportunité contient :
 - `updatedAt`.
 - `deletedAt`.
 
-Le montant est stocké en entier, idéalement en centimes, pour éviter les problèmes de précision des floats. La devise peut rester `EUR` par défaut. 
+Le montant est stocké en centimes entiers (`Int`) pour éviter les problèmes de précision des floats. La devise peut rester `EUR` par défaut. Note : `Int` (32 bits) est plafonné à ~21M EUR — suffisant pour un prototype, à remplacer par `BigInt` en production si nécessaire.
 
 ## Pipeline
 
-J’utilise un pipeline simple mais lisible, composé des étapes suivantes :
-- `lead`.
-- `qualified`.
-- `proposal`.
-- `negotiation`.
-- `won`.
-- `lost`.
+J'utilise un pipeline simple mais lisible, composé des étapes suivantes :
+- `LEAD`.
+- `QUALIFIED`.
+- `PROPOSAL`.
+- `NEGOTIATION`.
+- `WON`.
+- `LOST`.
 
-Ces étapes sont suffisantes pour un CRM interne minimal sans alourdir le modèle. Elles sont faciles à filtrer, à agréger, et à présenter dans l’UI. 
+Ces étapes sont suffisantes pour un CRM interne minimal sans alourdir le modèle. Elles sont faciles à filtrer, à agréger, et à présenter dans l'UI. 
+
 ## Opportunités à problème
 
-J’ai défini deux catégories de risque.
+J'ai défini deux catégories de risque.
 
 ### Opportunité en retard
 
 Une opportunité est considérée en retard si :
 - `expectedSignatureDate` est passée.
-- `stage` n’est ni `won` ni `lost`.
+- `stage` n'est ni `WON` ni `LOST`.
 
-Cela signifie qu’un deal devait être signé mais n’a pas encore été clôturé. C’est un signal clair, simple à comprendre, et utile pour l’équipe commerciale. 
+Cela signifie qu'un deal devait être signé mais n'a pas encore été clôturé. C'est un signal clair, simple à comprendre, et utile pour l'équipe commerciale. 
 
 ### Opportunité stagnante
 
 Une opportunité est considérée stagnante si :
 - `lastStageChangeAt` date de plus de `14 jours`.
-- et l’opportunité n’est pas déjà clôturée.
+- et l'opportunité n'est pas déjà clôturée.
 
-Le seuil de 14 jours est un choix par défaut raisonnable pour un prototype. Il pourra être rendu configurable via `.env` si nécessaire. 
+Le seuil de 14 jours est configurable via `STAGNANT_THRESHOLD_DAYS` dans `.env`. 
 
-### Priorité d’affichage
+### Priorité d'affichage
 
-Si une opportunité est à la fois en retard et stagnante, je lui applique le statut le plus critique, c’est-à-dire `late`. L’objectif est de rendre le tableau de bord immédiatement actionnable, sans multiplier les badges inutiles.
+Si une opportunité est à la fois en retard et stagnante, le statut `late` prend la priorité. L'objectif est de rendre le tableau de bord immédiatement actionnable, sans multiplier les badges inutiles.
 
 ## Soft delete
 
-J’ai choisi le **soft delete** pour `Client` et `Opportunity`. Une suppression applicative met donc `deletedAt` à la date courante au lieu de supprimer physiquement la ligne. Ce choix conserve l’historique métier, facilite la restauration future, et évite de casser des analyses ou relations existantes. 
+J'ai choisi le **soft delete** pour `Client` et `Opportunity`. Une suppression applicative met donc `deletedAt` à la date courante au lieu de supprimer physiquement la ligne. Ce choix conserve l'historique métier, facilite la restauration future, et évite de casser des analyses ou relations existantes. 
 
 ### Conséquence technique
 
-Tous les reads standards doivent exclure les enregistrements supprimés via `deletedAt = null`. Pour éviter les oublis, je centralise ce comportement dans une couche Prisma dédiée, soit via extension, soit via un wrapper de repository. Les suppressions logiques sont donc cohérentes dans toute l’application. 
-
-### Restauration future
-
-Le modèle laisse la porte ouverte à une action `restore`, qui remettrait `deletedAt` à `null`. Je ne l’implémente pas forcément dans le périmètre minimal, mais la structure la rend simple à ajouter. 
+Tous les reads standards excluent les enregistrements supprimés via `deletedAt = null`. Les suppressions logiques sont donc cohérentes dans toute l'application. La structure laisse la porte ouverte à une action `restore` qui remettrait `deletedAt` à `null`.
 
 ## Agrégation pipeline
 
-L’indicateur le plus utile à afficher est un résumé compact du pipeline, composé de :
+L'indicateur le plus utile à afficher est un résumé compact du pipeline, composé de :
 - la valeur totale par étape.
-- le nombre d’opportunités par étape.
-- la valeur totale du pipeline actif.
-- la valeur “à risque”, c’est-à-dire les opportunités en retard.
+- le nombre d'opportunités par étape.
+- la valeur totale du pipeline actif (hors WON/LOST).
+- la valeur "à risque", c'est-à-dire les opportunités en retard.
 
-Ce format donne à la fois une vision business et une lecture opérationnelle rapide. Il est aussi simple à calculer côté base avec Prisma. 
+Ce format donne à la fois une vision business et une lecture opérationnelle rapide.
+
+### Note de scalabilité
+
+L'implémentation actuelle charge toutes les opportunités actives en mémoire pour calculer les labels de risque (comparaisons de dates + config env). Pour un dataset de production (100k+ enregistrements), l'agrégation par étape devrait être déléguée à un `groupBy` Prisma ou du SQL brut, et le filtrage des opportunités à risque devrait se faire directement en base avec des filtres sur `expectedSignatureDate`.
 
 ## API
 
 ### Liste des opportunités
 
-L’endpoint de liste expose :
+L'endpoint de liste expose :
 - filtrage par `stage`.
 - filtrage par `clientType`.
-- tri.
-- pagination côté serveur.
+- tri par `createdAt`, `amountCents`, `expectedSignatureDate`, ou `stage`.
+- pagination côté serveur (`page/limit`, défaut 10 par page).
 
 Je choisis une pagination `page/limit` pour la lisibilité dans un test take-home. Si le dataset grossit, une pagination par curseur pourra être ajoutée plus tard. 
 
 ### Détail
 
-L’endpoint de détail renvoie :
-- l’opportunité.
-- le client associé.
-- les champs nécessaires à l’édition.
+L'endpoint de détail renvoie l'opportunité et le client associé avec tous ses champs.
 
 ### Création et édition
 
-Les DTOs sont validés côté backend. Les règles minimales sont :
-- `amount > 0`.
-- `stage` doit appartenir à l’enum.
+Les DTOs sont validés côté backend avec `class-validator`. Les règles minimales sont :
+- `amountCents > 0`.
+- `stage` doit appartenir à l'enum.
 - `expectedSignatureDate` doit être une date valide.
-- les champs spécifiques au type de client doivent correspondre au `type`.
+- `companyName` / `firstName` / `lastName` ne peuvent pas être des chaînes vides.
+- `sortBy` et `order` sont validés avec `@IsIn()` pour rejeter les valeurs inconnues.
 
 ### Suppression
 
-La suppression passe par un soft delete. Les routes REST peuvent rester classiques, mais l’action ne supprime jamais définitivement la donnée dans le flux normal.
+La suppression passe par un soft delete. La suppression d'un client est bloquée s'il possède des opportunités actives (retour `409 Conflict`).
 
 ## Validation
 
-J’utilise TypeScript strict, `class-validator` et `class-transformer` pour les DTOs NestJS. L’objectif est d’obtenir des erreurs claires, cohérentes et exploitables côté frontend. Les validations les plus importantes se font au niveau API pour éviter de dupliquer la logique. 
+J'utilise TypeScript strict, `class-validator` et `class-transformer` pour les DTOs NestJS. L'objectif est d'obtenir des erreurs claires, cohérentes et exploitables côté frontend. 
 
 ## Gestion des erreurs
 
-Je centralise la gestion des erreurs avec un filtre global NestJS. Les erreurs de validation et les erreurs Prisma sont converties en réponses JSON lisibles, avec des codes HTTP cohérents. Cela évite de laisser remonter des erreurs techniques brutes au frontend. 
+Je centralise la gestion des erreurs avec un filtre global NestJS. Les erreurs de validation et les erreurs Prisma connues (P2002, P2003, P2025) sont converties en réponses JSON lisibles avec des codes HTTP cohérents.
 
 ## Frontend
 
-L’interface Next.js suit une structure simple :
-- une page liste avec filtres et pagination.
-- une page détail pour une opportunité.
-- un formulaire commun de création / édition.
+L'interface Next.js suit une structure App Router :
+- une page liste avec filtres, tri, pagination et récap pipeline.
+- une page détail pour une opportunité avec la fiche client complète.
+- un formulaire commun de création / édition avec création inline de client.
 
-Les opportunités à problème sont mises en évidence visuellement avec un badge ou un état couleur. Les états de chargement, d’erreur et de vide sont gérés explicitement pour que l’application reste lisible même quand les données ne sont pas disponibles.
+Les opportunités à problème sont mises en évidence visuellement avec un badge coloré et une alerte contextuelle. Les états de chargement sont gérés par un skeleton screen (`loading.tsx`), les erreurs par `error.tsx`, et les ressources inexistantes par `not-found.tsx`.
 
 ## Design du code
 
-J’organise le backend de manière modulaire :
-- `clients`.
-- `opportunities`.
-- `pipeline`.
-- `common` pour les filtres, pipes, exceptions et utilitaires.
+Le backend est organisé de manière modulaire :
+- `clients` — CRUD clients.
+- `opportunities` — CRUD opportunités avec filtres, pagination et labels de risque.
+- `pipeline` — agrégation du pipeline.
+- `common` — filtres d'exception, types paginés, utilitaires de risque.
 
-Côté frontend, je privilégie des composants réutilisables pour la liste, les filtres, le formulaire et les cartes de statut. Le but est d’avoir un code propre sans sur-architecture.
+Le module `common/utils/opportunity-risk.util.ts` est testé unitairement. Le service `opportunities.service.ts` est testé avec le module de test NestJS et un mock de PrismaService.
 
 ## Index et performance
 
-Je prévois des index sur :
+Des index sont définis sur :
 - `client.type`.
+- `client.deletedAt`.
+- `client.email`.
+- `opportunity.clientId`.
 - `opportunity.stage`.
 - `opportunity.expectedSignatureDate`.
 - `opportunity.deletedAt`.
-- `opportunity.clientId`.
+- `opportunity.clientId + stage` (composite).
+- `opportunity.stage + expectedSignatureDate` (composite).
 
-Ces index couvrent les filtres et les tris les plus probables. Ils gardent le module réactif sans complexifier la structure. 
+Ces index couvrent les filtres et tris les plus probables.
 
 ## Ce que je ne fais pas
 
 Pour rester dans le périmètre du test, je ne rajoute pas :
-- d’authentification complète.
+- d'authentification complète.
 - de rôles complexes.
-- de workflow de tâches ou d’activités.
+- de workflow de tâches ou d'activités.
 - de reporting avancé.
 - de suppression physique dans le flux normal.
 
-Le but est de livrer un module simple, clair et solide, pas une suite CRM complète.
-
 ## Hypothèses de livraison
 
-Je pars sur :
 - NestJS pour le backend.
 - Next.js App Router pour le frontend.
 - Prisma + PostgreSQL pour la persistance.
@@ -209,5 +213,4 @@ Je pars sur :
 
 ## Résumé des choix
 
-En une phrase : j’ai privilégié une structure simple, une lecture métier claire, un soft delete, une pagination serveur basique, et des règles explicites pour identifier les opportunités problématiques. Ce sont des choix adaptés à un test où le raisonnement et la maintenabilité comptent plus qu’une architecture exhaustive. 
-
+Structure simple, lecture métier claire, modèle à table unique avec `legalId` pour différencier les entreprises, soft delete, pagination serveur, règles explicites pour les opportunités à problème, et tests unitaires + service pour valider la logique critique.

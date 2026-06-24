@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
@@ -15,17 +16,26 @@ export class CreateClientDto {
   // ─── Company fields ───────────────────────────────────────────
   @ValidateIf((o: CreateClientDto) => o.type === ClientType.COMPANY)
   @IsString()
+  @IsNotEmpty({ message: 'Company name is required for company clients.' })
   @MaxLength(255)
   companyName?: string;
+
+  @ValidateIf((o: CreateClientDto) => o.type === ClientType.COMPANY)
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  legalId?: string;
 
   // ─── Individual fields ────────────────────────────────────────
   @ValidateIf((o: CreateClientDto) => o.type === ClientType.INDIVIDUAL)
   @IsString()
+  @IsNotEmpty({ message: 'First name is required for individual clients.' })
   @MaxLength(100)
   firstName?: string;
 
   @ValidateIf((o: CreateClientDto) => o.type === ClientType.INDIVIDUAL)
   @IsString()
+  @IsNotEmpty({ message: 'Last name is required for individual clients.' })
   @MaxLength(100)
   lastName?: string;
 

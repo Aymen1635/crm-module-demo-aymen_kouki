@@ -173,6 +173,16 @@ export default async function OpportunityDetailPage({ params }: PageProps) {
             </div>
 
             <div className="client-card-body">
+              {opp.client.type === 'COMPANY' && opp.client.legalId && (
+                <div className="client-detail-row">
+                  <span className="client-detail-icon">🏢</span>
+                  <div className="client-detail-content">
+                    <div className="client-detail-label">Legal ID</div>
+                    <div className="client-detail-value font-mono text-sm">{opp.client.legalId}</div>
+                  </div>
+                </div>
+              )}
+
               {opp.client.email && (
                 <div className="client-detail-row">
                   <span className="client-detail-icon">✉️</span>

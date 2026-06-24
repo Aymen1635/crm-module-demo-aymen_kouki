@@ -25,6 +25,7 @@ model Client {
   id          String     @id @default(uuid()) @db.Uuid
   type        ClientType
   companyName String?    @db.VarChar(255)
+  legalId     String?    @db.VarChar(50)
   firstName   String?    @db.VarChar(100)
   lastName    String?    @db.VarChar(100)
   email       String     @db.VarChar(255)

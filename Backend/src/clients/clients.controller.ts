@@ -14,21 +14,14 @@ import {
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ClientType } from '@prisma/client';
-import { IsEnum, IsOptional } from 'class-validator';
-
-class ClientFilterQuery {
-  @IsOptional()
-  @IsEnum(ClientType)
-  type?: ClientType;
-}
+import { ClientFilterDto } from './dto/client-filter.dto';
 
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Get()
-  findAll(@Query() query: ClientFilterQuery) {
+  findAll(@Query() query: ClientFilterDto) {
     return this.clientsService.findAll(query.type);
   }
 

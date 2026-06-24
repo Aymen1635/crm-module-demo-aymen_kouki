@@ -10,6 +10,7 @@ async function main() {
     data: {
       type: ClientType.COMPANY,
       companyName: 'Acme Corp',
+      legalId: '12345678901234',
       email: 'contact@acme.com',
       phone: '+33 1 23 45 67 89',
       address: '12 Rue de la Paix, 75001 Paris',
@@ -21,6 +22,7 @@ async function main() {
     data: {
       type: ClientType.COMPANY,
       companyName: 'TechStart SAS',
+      legalId: '98765432100010',
       email: 'hello@techstart.io',
       phone: '+33 6 11 22 33 44',
       address: 'Station F, 5 Parv. Alan Turing, 75013 Paris',
@@ -31,6 +33,7 @@ async function main() {
     data: {
       type: ClientType.COMPANY,
       companyName: 'NexGen Industries',
+      legalId: '55544433300012',
       email: 'procurement@nexgen.fr',
       notes: 'Referred by Acme. Interested in premium tier.',
     },

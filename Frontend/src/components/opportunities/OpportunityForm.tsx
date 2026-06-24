@@ -33,6 +33,7 @@ interface FormState {
 interface NewClientState {
   type: ClientType;
   companyName: string;
+  legalId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -48,11 +49,12 @@ interface FormErrors {
   expectedSignatureDate?: string;
   stage?: string;
   _server?: string;
-  
+
   // New client errors
   companyName?: string;
   firstName?: string;
   lastName?: string;
+  email?: string;
 }
 
 export function OpportunityForm({ opportunity }: OpportunityFormProps) {
@@ -62,7 +64,7 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
   const [clients, setClients] = useState<ClientSummary[]>([]);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
+
   // Toggle for inline client creation
   const [isCreatingClient, setIsCreatingClient] = useState(false);
 
@@ -80,6 +82,7 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
   const [newClient, setNewClient] = useState<NewClientState>({
     type: 'COMPANY',
     companyName: '',
+    legalId: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -123,6 +126,12 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
         if (!newClient.firstName.trim()) next.firstName = 'First name is required.';
         if (!newClient.lastName.trim()) next.lastName = 'Last name is required.';
       }
+      // Email is required by the backend — validate it here for UX
+      if (!newClient.email.trim()) {
+        next.email = 'Email is required.';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newClient.email.trim())) {
+        next.email = 'Please enter a valid email address.';
+      }
     } else {
       if (!form.clientId) next.clientId = 'Please select a client.';
     }
@@ -160,6 +169,7 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
         const createdClient = await createClient({
           type: newClient.type,
           companyName: newClient.type === 'COMPANY' ? newClient.companyName.trim() : undefined,
+          legalId: newClient.type === 'COMPANY' && newClient.legalId.trim() ? newClient.legalId.trim() : undefined,
           firstName: newClient.type === 'INDIVIDUAL' ? newClient.firstName.trim() : undefined,
           lastName: newClient.type === 'INDIVIDUAL' ? newClient.lastName.trim() : undefined,
           email: newClient.email.trim(),
@@ -170,26 +180,21 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
         finalClientId = createdClient.id;
       }
 
-      if (isEditing && opportunity && !isCreatingClient) {
-        const updated = await updateOpportunity(opportunity.id, {
-          clientId: finalClientId,
-          title: form.title.trim(),
-          amountCents,
-          currency: form.currency,
-          expectedSignatureDate: form.expectedSignatureDate,
-          stage: form.stage,
-        });
+      const payload = {
+        clientId: finalClientId,
+        title: form.title.trim(),
+        amountCents,
+        currency: form.currency,
+        expectedSignatureDate: form.expectedSignatureDate,
+        stage: form.stage,
+      };
+
+      if (isEditing && opportunity) {
+        const updated = await updateOpportunity(opportunity.id, payload);
         router.push(`/opportunities/${updated.id}`);
         router.refresh();
       } else {
-        const created = await createOpportunity({
-          clientId: finalClientId,
-          title: form.title.trim(),
-          amountCents,
-          currency: form.currency,
-          expectedSignatureDate: form.expectedSignatureDate,
-          stage: form.stage,
-        });
+        const created = await createOpportunity(payload);
         router.push(`/opportunities/${created.id}`);
         router.refresh();
       }
@@ -257,16 +262,31 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
             </div>
 
             {newClient.type === 'COMPANY' ? (
-              <div className="form-group">
-                <label className="form-label">Company Name <span className="required">*</span></label>
-                <input
-                  type="text"
-                  className={`form-input ${errors.companyName ? 'error' : ''}`}
-                  value={newClient.companyName}
-                  onChange={(e) => setNewClientVal('companyName', e.target.value)}
-                />
-                {errors.companyName && <span className="form-error">⚠ {errors.companyName}</span>}
-              </div>
+              <>
+                <div className="form-group">
+                  <label className="form-label">Company Name <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    className={`form-input ${errors.companyName ? 'error' : ''}`}
+                    value={newClient.companyName}
+                    onChange={(e) => setNewClientVal('companyName', e.target.value)}
+                  />
+                  {errors.companyName && <span className="form-error">⚠ {errors.companyName}</span>}
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Legal ID (SIRET)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. 123 456 789 00012"
+                    value={newClient.legalId}
+                    onChange={(e) => setNewClientVal('legalId', e.target.value)}
+                  />
+                  <span className="form-hint" style={{ marginTop: '4px', display: 'block' }}>
+                    Optional — legal business identifier.
+                  </span>
+                </div>
+              </>
             ) : (
               <div className="form-row">
                 <div className="form-group">
@@ -294,13 +314,15 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
 
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Email</label>
+                <label className="form-label">Email <span className="required">*</span></label>
                 <input
                   type="email"
-                  className="form-input"
+                  className={`form-input ${errors.email ? 'error' : ''}`}
                   value={newClient.email}
                   onChange={(e) => setNewClientVal('email', e.target.value)}
+                  placeholder="client@example.com"
                 />
+                {errors.email && <span className="form-error">⚠ {errors.email}</span>}
               </div>
               <div className="form-group">
                 <label className="form-label">Phone</label>
@@ -312,7 +334,7 @@ export function OpportunityForm({ opportunity }: OpportunityFormProps) {
                 />
               </div>
             </div>
-            
+
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label">Address</label>
               <input

@@ -10,7 +10,11 @@ export class PipelineService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getSummary() {
-    // Get all active (non-deleted, non-closed) opportunities for risk computation
+    // ⚠️ Scalability note: we currently load all active opportunities into memory
+    // to compute risk labels (which depend on Date comparisons + env config).
+    // For a production dataset (100k+ records), the stage aggregation should
+    // move to a Prisma `groupBy` or raw SQL, and risk computation should be
+    // handled via a database query with date filters.
     const activeOpportunities = await this.prisma.opportunity.findMany({
       where: { deletedAt: null },
       select: {
