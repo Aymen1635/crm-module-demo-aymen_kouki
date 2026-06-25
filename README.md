@@ -42,7 +42,7 @@ Les variables d'environnement sont nécessaires pour connecter la base de donné
 **Backend (`Backend/.env`) :**
 Créez un fichier `.env` dans le dossier `Backend/` avec ce contenu :
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/crm_dev"
+DATABASE_URL="postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/crm_dev"
 PORT=3001
 STAGNANT_THRESHOLD_DAYS=14
 ```

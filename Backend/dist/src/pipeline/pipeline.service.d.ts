@@ -6,7 +6,7 @@ export declare class PipelineService {
         stages: {
             count: number;
             totalAmountCents: number;
-            stage: "LEAD" | "QUALIFIED" | "PROPOSAL" | "NEGOTIATION" | "WON" | "LOST";
+            stage: "PROPOSAL" | "NEGOTIATION" | "QUALIFIED" | "LEAD" | "WON" | "LOST";
         }[];
         totalActiveCents: number;
         atRiskCents: number;

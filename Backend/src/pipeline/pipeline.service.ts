@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { OpportunityStage } from '@prisma/client';
 
 const ALL_STAGES = Object.values(OpportunityStage);
-const CLOSED_STAGES = [OpportunityStage.WON, OpportunityStage.LOST];
+const CLOSED_STAGES: OpportunityStage[] = [OpportunityStage.WON, OpportunityStage.LOST];
 
 @Injectable()
 export class PipelineService {
