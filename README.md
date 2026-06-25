@@ -4,6 +4,17 @@ Un module CRM minimal orienté production, construit avec **NestJS 11**, **Next.
 
 ---
 
+## Démo en ligne
+
+| Service | URL |
+|---|---|
+| Frontend (Vercel) | [crm-module-demo-aymen-kouki-fronten.vercel.app](https://crm-module-demo-aymen-kouki-fronten.vercel.app/) |
+| Backend API (Railway) | Déployé sur Railway — consommé par le frontend ci-dessus |
+
+> Le projet est entièrement déployé et fonctionnel. Aucune installation locale n'est nécessaire pour évaluer l'interface.
+
+---
+
 ## Stack Technique
 
 | Couche | Technologie |

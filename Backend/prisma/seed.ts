@@ -114,11 +114,11 @@ async function main() {
     {
       clientId: techstart.id,
       title: 'Starter SaaS Subscription',
-      amountCents: 99_00, // 99 EUR
+      amountCents: 9_900, // 99 EUR
       currency: 'EUR',
-      expectedSignatureDate: daysFromNow(7),
+      expectedSignatureDate: daysFromNow(21), // QUALIFIED still needs PROPOSAL + NEGOTIATION ahead
       stage: OpportunityStage.QUALIFIED,
-      lastStageChangeAt: daysAgo(5),
+      lastStageChangeAt: daysAgo(3),
     },
     {
       clientId: nexgen.id,
@@ -180,9 +180,9 @@ async function main() {
     {
       clientId: bernard.id,
       title: 'Solo Entrepreneur Package',
-      amountCents: 79_00, // 79 EUR
+      amountCents: 7_900, // 79 EUR
       currency: 'EUR',
-      expectedSignatureDate: daysAgo(30),
+      expectedSignatureDate: daysAgo(27), // client signed 3 days ahead of schedule
       stage: OpportunityStage.WON,
       lastStageChangeAt: daysAgo(30),
     },
@@ -192,9 +192,9 @@ async function main() {
       title: 'Hardware Integration Bid',
       amountCents: 800_000,
       currency: 'EUR',
-      expectedSignatureDate: daysAgo(60),
+      expectedSignatureDate: daysAgo(50), // prospect pulled out 12 days before expected close
       stage: OpportunityStage.LOST,
-      lastStageChangeAt: daysAgo(55),
+      lastStageChangeAt: daysAgo(62),
     },
     {
       clientId: martin.id,

@@ -230,6 +230,19 @@ Pour rester dans le périmètre du test, je ne rajoute pas :
 - un README de démarrage rapide.
 - des commits atomiques et descriptifs.
 
+## Déploiement (hors périmètre du test, réalisé en bonus)
+
+Le projet est déployé en production sur deux plateformes :
+
+- **Frontend** — Vercel. Next.js App Router avec rendu hybride (SSR + Client Components). Variable d'environnement `NEXT_PUBLIC_API_URL` pointant vers le backend Railway.
+- **Backend** — Railway. NestJS compilé avec `tsc` (sans dépendance à la NestJS CLI en production). PostgreSQL fourni par Railway. Migrations appliquées au démarrage via `prisma migrate deploy`.
+
+Quelques arbitrages liés au déploiement :
+- `@nestjs/cli` et `typescript` déplacés dans `dependencies` pour être disponibles lors du build Railway (qui installe avec `NODE_ENV=production`).
+- `prisma` déplacé dans `dependencies` pour la même raison.
+- La commande de build utilise `tsc -p tsconfig.build.json` directement : `prisma.config.ts` étant à la racine de `Backend/`, son inclusion dans la compilation forçait TypeScript à inférer `rootDir` sur le répertoire parent, déplaçant la sortie compilée vers `dist/src/` au lieu de `dist/`. L'appel direct à `tsc` contourne ce comportement.
+- `prisma.config.ts` inclut un fallback `postgresql://localhost:5432/crm_dev` pour `DATABASE_URL` afin que `prisma generate` fonctionne au `postinstall` sur un clone sans `.env`.
+
 ## Synchronisation Frontend/Backend en développement
 
 Afin d'éviter des erreurs de type `ECONNREFUSED` lors du rendu côté serveur (SSR) par Next.js (qui démarre souvent plus vite que NestJS), j'ai ajouté `wait-on` dans les scripts de développement. Le script `dev:frontend` attend que le backend écoute sur le port 3001 (`tcp:3001`) avant de lancer le serveur Next.js. Cela garantit un démarrage propre et sans erreurs lors du lancement de l'application en mode développement.
