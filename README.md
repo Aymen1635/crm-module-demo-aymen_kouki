@@ -35,6 +35,8 @@ Suivez ces étapes simples pour lancer le projet :
 npm install
 ```
 
+> **VS Code :** Le client Prisma est généré automatiquement pendant `npm install`. Si vous voyez des erreurs TypeScript dans l'éditeur, faites `Ctrl+Shift+P` → **"Developer: Reload Window"** pour que le serveur TypeScript prenne en compte les types générés.
+
 ### 2 — Configurer l'environnement
 
 Les variables d'environnement sont nécessaires pour connecter la base de données et l'API.
@@ -65,9 +67,11 @@ docker compose up -d
 
 Cette étape va créer les tables et ajouter des données de test (clients et opportunités) :
 ```bash
-npm run db:migrate   # Applique les migrations Prisma
+npm run db:migrate   # Applique les migrations Prisma (génère aussi le client Prisma)
 npm run db:seed      # Injecte les fausses données
 ```
+
+> **Note :** Le client Prisma est aussi généré automatiquement lors du `npm install` (script `postinstall`), ce qui garantit que les types TypeScript sont disponibles dès l'ouverture du projet dans votre IDE.
 
 ### 5 — Démarrer l'application
 

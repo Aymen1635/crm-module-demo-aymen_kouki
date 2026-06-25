@@ -9,6 +9,9 @@ config();
 export default defineConfig({
   schema: './prisma/schema.prisma',
   datasource: {
-    url: process.env.DATABASE_URL,
+    // Fallback keeps `prisma generate` (postinstall) working on a fresh clone
+    // before .env exists. generate never opens a DB connection so the value
+    // doesn't matter — only migrate/studio need the real URL.
+    url: process.env.DATABASE_URL ?? 'postgresql://localhost:5432/crm_dev',
   },
 });

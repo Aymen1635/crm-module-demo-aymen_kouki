@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "build": "prisma generate && nest build",
+    "postinstall": "prisma generate",
+    "postinstall": "prisma generate",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -26,8 +28,10 @@
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@nestjs/cli": "^11.0.0",
     "dotenv": "^16.0.0",
     "prisma": "^7.8.0",
+    "typescript": "^5.3.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "pg": "^8.22.0",
@@ -35,7 +39,6 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
     "@types/express": "^5.0.0",
@@ -53,8 +56,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.3.3"
+    "tsconfig-paths": "^4.2.0"
   },
   "jest": {
     "moduleFileExtensions": [
