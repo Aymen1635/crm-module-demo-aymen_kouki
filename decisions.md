@@ -121,9 +121,14 @@ Les deux catégories de risque sont distinguées dans le résumé car elles appe
 
 Ce format donne à la fois une vision business et une lecture opérationnelle rapide.
 
-### Note de scalabilité
+### Implémentation DB-level
 
-L'implémentation actuelle charge toutes les opportunités actives en mémoire pour calculer les labels de risque (comparaisons de dates + config env). Pour un dataset de production (100k+ enregistrements), l'agrégation par étape devrait être déléguée à un `groupBy` Prisma ou du SQL brut, et le filtrage des opportunités à risque devrait se faire directement en base avec des filtres sur `expectedSignatureDate`.
+L'agrégation s'effectue entièrement en base via trois requêtes parallèles :
+- `groupBy('stage')` avec `_count` et `_sum` pour la répartition par étape.
+- `aggregate` filtré sur `expectedSignatureDate < today` pour les opportunités en retard.
+- `aggregate` filtré sur `lastStageChangeAt < stagnantCutoff` ET `expectedSignatureDate >= today` pour les opportunités stagnantes (le filtre `gte today` exclut les deals déjà en retard, cohérent avec la priorité `late > stagnant`).
+
+Les trois requêtes sont lancées en parallèle via `Promise.all`. Aucun enregistrement n'est chargé en mémoire.
 
 ## API
 
