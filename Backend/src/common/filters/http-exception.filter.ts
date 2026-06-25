@@ -7,25 +7,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Prisma } from '@prisma/client';
 
-/**
- * We detect Prisma errors by checking the constructor name rather than
- * using `instanceof` with an import from `@prisma/client`.  This avoids
- * the tight coupling to the generated Prisma namespace and works
- * reliably across Prisma versions.
- */
-interface PrismaKnownError {
-  code: string;
-  meta?: Record<string, unknown>;
-  message: string;
-}
-
-function isPrismaKnownError(err: unknown): err is PrismaKnownError {
-  return (
-    err instanceof Error &&
-    err.constructor.name === 'PrismaClientKnownRequestError' &&
-    'code' in err
-  );
+function isPrismaKnownError(
+  err: unknown,
+): err is Prisma.PrismaClientKnownRequestError {
+  return err instanceof Prisma.PrismaClientKnownRequestError;
 }
 
 @Catch()
@@ -91,7 +78,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
   }
 
-  private mapPrismaError(err: PrismaKnownError): {
+  private mapPrismaError(err: Prisma.PrismaClientKnownRequestError): {
     status: number;
     message: string;
   } {

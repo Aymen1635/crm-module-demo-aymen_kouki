@@ -6,7 +6,7 @@ export declare class PipelineController {
         stages: {
             count: number;
             totalAmountCents: number;
-            stage: "PROPOSAL" | "NEGOTIATION" | "QUALIFIED" | "LEAD" | "WON" | "LOST";
+            stage: "LEAD" | "QUALIFIED" | "PROPOSAL" | "NEGOTIATION" | "WON" | "LOST";
         }[];
         totalActiveCents: number;
         atRiskCents: number;

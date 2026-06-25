@@ -9,10 +9,9 @@ var HttpExceptionFilter_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
 function isPrismaKnownError(err) {
-    return (err instanceof Error &&
-        err.constructor.name === 'PrismaClientKnownRequestError' &&
-        'code' in err);
+    return err instanceof client_1.Prisma.PrismaClientKnownRequestError;
 }
 let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
     constructor() {

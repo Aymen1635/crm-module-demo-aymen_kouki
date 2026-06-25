@@ -171,6 +171,8 @@ J'utilise TypeScript strict, `class-validator` et `class-transformer` pour les D
 
 Je centralise la gestion des erreurs avec un filtre global NestJS. Les erreurs de validation et les erreurs Prisma connues (P2002, P2003, P2025) sont converties en réponses JSON lisibles avec des codes HTTP cohérents.
 
+La détection des erreurs Prisma utilise `instanceof Prisma.PrismaClientKnownRequestError` (importé depuis `@prisma/client`), ce qui est plus fiable qu'une vérification par `constructor.name` — cette dernière peut silencieusement échouer après minification ou en présence de plusieurs instances Prisma.
+
 ## Frontend
 
 L'interface Next.js suit une structure App Router :
