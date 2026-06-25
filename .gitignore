@@ -6,3 +6,4 @@ test.md
 /Frontend/.env.local
 /Frontend/.next
 /Frontend/package-lock.json
+/Backend/dist
